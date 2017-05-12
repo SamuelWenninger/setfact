@@ -3,11 +3,17 @@
   "projects": {
     "1": {
       "name": "PA3 Frontend",
-      "path": "/c/Users/swenninger/git/pa3-frontend"
+      "path": {
+        "Windows": "c:\\Users\\swenninger\\git\\pa3-frontend",
+        "Linux": "/c/Users/swenninger/git/pa3-frontend"
+      }
     },
     "2": {
       "name": "PA3 Options Components",
-      "path": "/c/Users/swenninger/git/pa3-options-components"
+      "path": {
+        "Windows": "c:\\Users\\swenninger\\git\\pa3-options-components",
+        "Linux": "/c/Users/swenninger/git/pa3-options-components"
+      }
     }
   },
 
@@ -15,47 +21,88 @@
     "1": {
       "projectId": 1,
       "name": "Building Grunt for release",
-      "commandList": ["grunt"]
+      "commandList": {
+        "Windows": ["grunt"],
+        "Linux": ["grunt"]
+      }
     },
     "2": {
       "projectId": 1,
       "name": "Building Grunt for development",
-      "commandList": ["grunt dev"]
+      "commandList": {
+        "Windows": ["grunt dev"],
+        "Linux": ["grunt dev"]
+      }
     },
     "3": {
       "projectId": 1,
       "name": "Building Grunt with OC for development",
-      "commandList": ["grunt build-pa3oc-local-dev"]
+      "commandList": {
+        "Windows": ["grunt build-pa3oc-local-dev"],
+        "Linux": ["grunt build-pa3oc-local-dev"]
+      }
     },
     "4": {
       "projectId": 1,
       "name": "Building Grunt with OC for release",
-      "commandList": ["grunt build-pa3oc-local"]
+      "commandList": {
+        "Windows": ["grunt build-pa3oc-local"],
+        "Linux": ["grunt build-pa3oc-local"]
+      }
     },
     "5": {
       "projectId": 1,
       "name": "Compressing release files",
-      "commandList": ["grunt release --force"]
+      "commandList": {
+        "Windows": ["grunt release --force"],
+        "Linux": ["grunt release --force"]
+      }
     },
     "6": {
       "projectId": 2,
       "name": "Building Gulp for development",
-      "commandList": ["gulp dev:master"]
+      "commandList": {
+        "Windows": ["gulp dev:master"],
+        "Linux": ["gulp dev:master"]
+      }
     },
     "7": {
       "projectId": 2,
       "name": "Building Gulp for release",
-      "commandList": ["gulp"]
+      "commandList": {
+        "Windows": ["gulp"],
+        "Linux": ["gulp"]
+      }
     },
     "8": {
       "projectId": 1,
       "name": "Doing a clean bower install",
-      "commandList": ["rm -rf bower_components", "bower cache clean", "bower install"]
+      "commandList": {
+        "Windows": ["rd /s /q bower_components", "bower cache clean", "bower install"],
+        "Linux": ["rm -rfv bower_components", "bower cache clean", "bower install"]
+      }
     },
     "9": {
       "projectId": 2,
       "name": "Doing a clean bower install",
-      "commandList": ["rm -rf bower_components", "bower cache clean", "bower install"]
+      "commandList": {
+        "Windows": ["rd /s /q bower_components", "bower cache clean", "bower install"],
+        "Linux": ["rm -rfv bower_components", "bower cache clean", "bower install"]
+      }
+    },
+    "10": {
+      "projectId": 1,
+      "name": "Making a directory in ~/public_html if necessary",
+      "commandList": {
+        "Windows": ["PROMPT#1","WINSSH fxdeva10.factset.com \"mkdir -pv ~/public_html/\""],
+        "Linux": ["PROMPT#1","ssh fxdeva10.factset.com \"mkdir -pv ~/public_html/{{}}\""]
+      }
+    }
+  },
+
+  "prompts": {
+    "1": {
+      "text": "Enter your directory name (in your public_html): "
     }
   },
 
@@ -65,7 +112,15 @@
       "tasks": [
         {
           "name": "Build Dev",
+          "commandSequence": [2]
+        },
+        {
+          "name": "Build Prebuild",
           "commandSequence": [1]
+        },
+        {
+          "name": "Clean Bower Install",
+          "commandSequence": [8]
         }
       ]
     },
@@ -75,6 +130,14 @@
         {
           "name": "Build Dev",
           "commandSequence": [6, 3]
+        },
+        {
+          "name": "Build Prebuild",
+          "commandSequence": [7, 4, 5]
+        },
+        {
+          "name": "Clean Bower Install",
+          "commandSequence": [8, 9]
         }
       ]
     }
