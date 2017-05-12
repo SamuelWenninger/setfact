@@ -60,6 +60,22 @@ def getUserInput(settings):
     # Index is one less than the user inputted selection
     return location
 
+def handlePrompts(settings, commandList):
+    stringCommandList = ''.join(commandList)
+    if 'PROMPT' not in stringCommandList:
+        return commandList
+    dirName = False
+    newCommandList = []
+    for command in commandList:
+        if 'PROMPT' in command:
+            promptNum = str(command.split('#')[-1])
+            dirName = input(settings['prompts'][promptNum]['text'])
+            continue
+        if dirName is not False and '{{}}' in command:
+            command = command.replace('{{}}', dirName)
+        newCommandList.append(command)
+    return newCommandList
+
 # Desc: Run a given task in the correct context given the tasks index
 # Input: "location" - a dict containing the "modeIndex" and "taskIndex"
 # Output:
@@ -76,14 +92,32 @@ def runTask(settings, location):
         # to the location of said project before executing the requested command
         if prevProjectId is False or commandProjectId != prevProjectId:
             prevProjectId = commandProjectId
-            print(os.getcwd())
             os.chdir(str(settings['projects'][str(commandProjectId)]['path'][PLATFORM]))
-            print(os.getcwd())
         printBoxMenu([command['name']], len(command['name']))
         # The subprocess causes the output to be buffered so a manual flush is required here.
         sys.stdout.flush()
-        for item in command['commandList'][PLATFORM]:
-            subprocess.run(item, shell=True)
+        updatedCommand = handlePrompts(settings, command['commandList'][PLATFORM])
+        stringCommandList = ''.join(updatedCommand)
+        if 'WINSSH' not in stringCommandList:
+            for item in updatedCommand:
+                subprocess.run(item, shell=True)
+        else:
+            arg = False
+            for item in updatedCommand:
+                if arg is True:
+                    arg = False
+                    ssh = paramiko.SSHClient()
+                    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                    server = str(item.split('"')[0].strip())
+                    command = str(item.split('"')[1].strip())
+                    ssh.connect(server)
+                    stdin, stdout, stderr = ssh.exec_command(command)
+                    for line in stdout.readlines():
+                        print(line)
+                if item == 'WINSSH':
+                    arg = True
+                    continue
+
     return
 
 def main():
@@ -107,12 +141,7 @@ if __name__ == '__main__':
         PLATFORM = 'Windows'
     else:
         PLATFORM = platform.system()
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect('fxdeva10.factset.com')
-    stdin, stdout, stderr = ssh.exec_command('ls')
-    print(stdout.readlines())
-    #main()
+    main()
 
 # To Do
 ## Add an upload prebuild task
