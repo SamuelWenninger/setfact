@@ -3,7 +3,7 @@
 # Created by Samuel Wenninger
 # Last modified 5/11/2017
 
-import json, subprocess
+import json, subprocess, os, sys, platform, psutil, paramiko
 
 # Desc: Read the settings file and turn it into a Python data structure (dict/list)
 # Input: N/A
@@ -76,10 +76,14 @@ def runTask(settings, location):
         # to the location of said project before executing the requested command
         if prevProjectId is False or commandProjectId != prevProjectId:
             prevProjectId = commandProjectId
-            commandList.append('cd ' + str(settings['projects'][str(commandProjectId)]['path']))
-        commandList += command['commandList']
-    print(' && '.join(commandList))
-    subprocess.run(' && '.join(commandList))
+            print(os.getcwd())
+            os.chdir(str(settings['projects'][str(commandProjectId)]['path'][PLATFORM]))
+            print(os.getcwd())
+        printBoxMenu([command['name']], len(command['name']))
+        # The subprocess causes the output to be buffered so a manual flush is required here.
+        sys.stdout.flush()
+        for item in command['commandList'][PLATFORM]:
+            subprocess.run(item, shell=True)
     return
 
 def main():
@@ -97,10 +101,21 @@ def main():
     return
 
 if __name__ == '__main__':
-    main()
+    PLATFORM = ''
+    ppid = os.getppid()
+    if psutil.Process(ppid).name() == 'cmd.exe' or platform.system() == 'Windows':
+        PLATFORM = 'Windows'
+    else:
+        PLATFORM = platform.system()
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect('fxdeva10.factset.com')
+    stdin, stdout, stderr = ssh.exec_command('ls')
+    print(stdout.readlines())
+    #main()
 
 # To Do
 ## Add an upload prebuild task
 ### Prompt the user for a prebuild folder and a prebuild name
-## Add a -v (verbose) option to print out what commands are being executed
+### Use PROMPT to prompt a user and VAR somewhere afterwards
 ## Add a -f (file) option to allow the user to pass in a different settings.json file
