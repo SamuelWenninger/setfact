@@ -60,7 +60,7 @@ def getUserInput(settings):
     # Index is one less than the user inputted selection
     return location
 
-def handlePrompts(settings, commandList):
+def handlePrompts(settings, commandList, promptResponses):
     stringCommandList = ''.join(commandList)
     if 'PROMPT' not in stringCommandList:
         return commandList
@@ -69,7 +69,12 @@ def handlePrompts(settings, commandList):
     for command in commandList:
         if 'PROMPT' in command:
             promptNum = str(command.split('#')[-1])
-            dirName = input(settings['prompts'][promptNum]['text'])
+            # Check for a previous response to the same prompt and use it if it is available.
+            if str(promptNum) in promptResponses.keys():
+                dirName = promptResponses[str(promptNum)]
+            else:
+                dirName = input(settings['prompts'][promptNum]['text'])
+            promptResponses[str(promptNum)] = dirName
             continue
         if dirName is not False and '{{}}' in command:
             command = command.replace('{{}}', dirName)
@@ -83,6 +88,9 @@ def runTask(settings, location):
     #subprocess.run('mkdir -v test')
     commandList = []
     prevProjectId = False
+    # Keep track of previous responses for commands that use the same prompt so that the user
+    # is not prompted multiple times for the same information
+    promptResponses = {}
     for commandId in settings['modes'][location['modeIndex']]['tasks'][location['taskIndex']]['commandSequence']:
         # Get the command object
         command = settings['commands'][str(commandId)]
@@ -96,7 +104,7 @@ def runTask(settings, location):
         printBoxMenu([command['name']], len(command['name']))
         # The subprocess causes the output to be buffered so a manual flush is required here.
         sys.stdout.flush()
-        updatedCommand = handlePrompts(settings, command['commandList'][PLATFORM])
+        updatedCommand = handlePrompts(settings, command['commandList'][PLATFORM], promptResponses)
         stringCommandList = ''.join(updatedCommand)
         if 'WINSSH' not in stringCommandList:
             for item in updatedCommand:
