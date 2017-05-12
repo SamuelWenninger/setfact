@@ -66,6 +66,7 @@ def handlePrompts(settings, commandList, promptResponses):
     if 'PROMPT' not in stringCommandList:
         return commandList
     dirName = False
+    promptNum = '1'
     newCommandList = []
     for command in commandList:
         if 'PROMPT' in command:
@@ -77,8 +78,8 @@ def handlePrompts(settings, commandList, promptResponses):
                 dirName = input(settings['prompts'][promptNum]['text'])
             promptResponses[str(promptNum)] = dirName
             continue
-        if dirName is not False and '{{}}' in command:
-            command = command.replace('{{}}', dirName)
+        if dirName is not False and ('{{' + promptNum + '}}') in command:
+            command = command.replace('{{' + promptNum + '}}', dirName)
         newCommandList.append(command)
     return newCommandList
 

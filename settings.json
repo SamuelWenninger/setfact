@@ -94,24 +94,32 @@
       "projectId": 1,
       "name": "Making a directory in ~/public_html if necessary",
       "commandList": {
-        "Windows": ["PROMPT#1", "WINSSH", "fxdeva10.factset.com \"mkdir -pv ~/public_html/{{}}\""],
-        "Linux": ["PROMPT#1", "ssh fxdeva10.factset.com \"mkdir -pv ~/public_html/{{}}\""]
+        "Windows": ["PROMPT#1", "WINSSH", "fxdeva10.factset.com \"mkdir -pv ~/public_html/{{1}}\""],
+        "Linux": ["PROMPT#1", "ssh fxdeva10.factset.com \"mkdir -pv ~/public_html/{{1}}\""]
       }
     },
     "11": {
       "projectId": 1,
       "name": "Securely upload deploy.zip",
       "commandList": {
-        "Windows": ["PROMPT#1", "WINSCP", "deploy.zip", "fxdeva10.factset.com", "./public_html/{{}}"],
-        "Linux": ["PROMPT#1", "scp deploy.zip fxdeva10.factset.com:~/public_html/{{}}\""]
+        "Windows": ["PROMPT#1", "WINSCP", "deploy.zip", "fxdeva10.factset.com", "./public_html/{{1}}"],
+        "Linux": ["PROMPT#1", "scp deploy.zip fxdeva10.factset.com:~/public_html/{{1}}\""]
       }
     },
     "12": {
       "projectId": 1,
       "name": "Unzip the uploaded deploy.zip",
       "commandList": {
-        "Windows": ["PROMPT#1", "WINSSH", "fxdeva10.factset.com \"cd ~/public_html/{{}} && unzip -o deploy.zip && \\rm -f deploy.zip\""],
-        "Linux": ["PROMPT#1", "ssh fxdeva10.factset.com \"cd ~/public_html/{{}} && unzip -o deploy.zip && \\rm -f deploy.zip\""]
+        "Windows": ["PROMPT#1", "WINSSH", "fxdeva10.factset.com \"cd ~/public_html/{{1}} && unzip -o deploy.zip && \\rm -f deploy.zip\""],
+        "Linux": ["PROMPT#1", "ssh fxdeva10.factset.com \"cd ~/public_html/{{1}} && unzip -o deploy.zip && \\rm -f deploy.zip\""]
+      }
+    },
+    "13": {
+      "projectId": 1,
+      "name": "Create a LIMA override and a VMS prebuild",
+      "commandList": {
+        "Windows": ["PROMPT#1", "PROMPT#2", "WINSSH", "fxdeva10.factset.com \"~/create_prebuild.sh {{2}} {{1}}\""],
+        "Linux": ["PROMPT#1", "ssh fxdeva10.factset.com \"cd ~/public_html/{{1}} && unzip -o deploy.zip && \\rm -f deploy.zip\""]
       }
     }
   },
@@ -119,6 +127,9 @@
   "prompts": {
     "1": {
       "text": "Enter your directory name (in your public_html): "
+    },
+    "2": {
+      "text": "Enter your prebuild name (your username will be prepended automatically): "
     }
   },
 
@@ -143,6 +154,10 @@
           "commandSequence": [1, 5, 10, 11, 12]
         },
         {
+          "name": "(New) Build & Upload Prebuild",
+          "commandSequence": [1, 5, 10, 11, 12, 13]
+        },
+        {
           "name": "Clean Bower Install",
           "commandSequence": [8]
         }
@@ -162,6 +177,10 @@
         {
           "name": "(Update) Build & Upload Prebuild",
           "commandSequence": [7, 4, 5, 10, 11, 12]
+        },
+        {
+          "name": "(New) Build & Upload Prebuild",
+          "commandSequence": [7, 4, 5, 10, 11, 12, 13]
         },
         {
           "name": "Clean Bower Install",
