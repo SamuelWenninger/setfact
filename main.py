@@ -4,6 +4,7 @@
 # Last modified 5/11/2017
 
 import json, subprocess, os, sys, platform, psutil, paramiko
+from scp import SCPClient
 
 # Desc: Read the settings file and turn it into a Python data structure (dict/list)
 # Input: N/A
@@ -106,25 +107,42 @@ def runTask(settings, location):
         sys.stdout.flush()
         updatedCommand = handlePrompts(settings, command['commandList'][PLATFORM], promptResponses)
         stringCommandList = ''.join(updatedCommand)
-        if 'WINSSH' not in stringCommandList:
+        if 'WINSSH' not in stringCommandList and 'WINSCP' not in stringCommandList:
             for item in updatedCommand:
                 subprocess.run(item, shell=True)
         else:
             arg = False
-            for item in updatedCommand:
-                if arg is True:
-                    arg = False
-                    ssh = paramiko.SSHClient()
-                    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                    server = str(item.split('"')[0].strip())
-                    command = str(item.split('"')[1].strip())
-                    ssh.connect(server)
-                    stdin, stdout, stderr = ssh.exec_command(command)
-                    for line in stdout.readlines():
-                        print(line)
-                if item == 'WINSSH':
-                    arg = True
-                    continue
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            if 'WINSSH' in stringCommandList:
+                for item in updatedCommand:
+                    if arg is True:
+                        arg = False
+                        server = str(item.split('"')[0].strip())
+                        command = str(item.split('"')[1].strip())
+                        ssh.connect(server)
+                        stdin, stdout, stderr = ssh.exec_command(command)
+                        for line in stdout.readlines():
+                            print(line)
+
+                    if item == 'WINSSH':
+                        arg = True
+                        continue
+            elif 'WINSCP' in stringCommandList:
+                skips = 0
+                for index, item in enumerate(updatedCommand):
+                    if skips:
+                        skips -= 1
+                        continue
+                    if item == 'WINSCP':
+                        fileName = updatedCommand[index + 1]
+                        server = updatedCommand[index + 2]
+                        dest = updatedCommand[index + 3]
+                        ssh.connect(server)
+                        scp = SCPClient(ssh.get_transport())
+                        scp.put(fileName, dest)
+                        skips = 3
+                        continue
 
     return
 

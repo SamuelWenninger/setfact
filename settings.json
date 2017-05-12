@@ -95,7 +95,23 @@
       "name": "Making a directory in ~/public_html if necessary",
       "commandList": {
         "Windows": ["PROMPT#1", "WINSSH", "fxdeva10.factset.com \"mkdir -pv ~/public_html/{{}}\""],
-        "Linux": ["PROMPT#1","ssh fxdeva10.factset.com \"mkdir -pv ~/public_html/{{}}\""]
+        "Linux": ["PROMPT#1", "ssh fxdeva10.factset.com \"mkdir -pv ~/public_html/{{}}\""]
+      }
+    },
+    "11": {
+      "projectId": 1,
+      "name": "Securely upload deploy.zip",
+      "commandList": {
+        "Windows": ["PROMPT#1", "WINSCP", "deploy.zip", "fxdeva10.factset.com", "./public_html/{{}}"],
+        "Linux": ["PROMPT#1", "scp deploy.zip fxdeva10.factset.com:~/public_html/{{}}\""]
+      }
+    },
+    "12": {
+      "projectId": 1,
+      "name": "Unzip the uploaded deploy.zip",
+      "commandList": {
+        "Windows": ["PROMPT#1", "WINSSH", "fxdeva10.factset.com \"cd ~/public_html/{{}} && unzip -o deploy.zip && \\rm -f deploy.zip\""],
+        "Linux": ["PROMPT#1", "ssh fxdeva10.factset.com \"cd ~/public_html/{{}} && unzip -o deploy.zip && \\rm -f deploy.zip\""]
       }
     }
   },
@@ -119,6 +135,14 @@
           "commandSequence": [1]
         },
         {
+          "name": "Upload Prebuild",
+          "commandSequence": [5, 10, 11, 12]
+        },
+        {
+          "name": "(Update) Build & Upload Prebuild",
+          "commandSequence": [1, 5, 10, 11, 12]
+        },
+        {
           "name": "Clean Bower Install",
           "commandSequence": [8]
         }
@@ -136,12 +160,12 @@
           "commandSequence": [7, 4, 5]
         },
         {
-          "name": "Clean Bower Install",
-          "commandSequence": [8, 9]
+          "name": "(Update) Build & Upload Prebuild",
+          "commandSequence": [7, 4, 5, 10, 11, 12]
         },
         {
-          "name": "Make directory in public_html (if necessary)",
-          "commandSequence": [10]
+          "name": "Clean Bower Install",
+          "commandSequence": [8, 9]
         }
       ]
     }
