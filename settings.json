@@ -94,7 +94,7 @@
       "projectId": 1,
       "name": "Making a directory in ~/public_html if necessary",
       "commandList": {
-        "Windows": ["PROMPT#1","WINSSH fxdeva10.factset.com \"mkdir -pv ~/public_html/\""],
+        "Windows": ["PROMPT#1", "WINSSH", "fxdeva10.factset.com \"mkdir -pv ~/public_html/{{}}\""],
         "Linux": ["PROMPT#1","ssh fxdeva10.factset.com \"mkdir -pv ~/public_html/{{}}\""]
       }
     }
@@ -138,6 +138,10 @@
         {
           "name": "Clean Bower Install",
           "commandSequence": [8, 9]
+        },
+        {
+          "name": "Make directory in public_html (if necessary)",
+          "commandSequence": [10]
         }
       ]
     }
