@@ -91,7 +91,6 @@
       }
     },
     "10": {
-      "projectId": 1,
       "name": "Making a directory in ~/public_html if necessary",
       "commandList": {
         "Windows": ["PROMPT#1", "WINSSH", "fxdeva10.factset.com \"mkdir -pv ~/public_html/{{1}}\""],
@@ -115,11 +114,22 @@
       }
     },
     "13": {
-      "projectId": 1,
       "name": "Create a LIMA override and a VMS prebuild",
       "commandList": {
         "Windows": ["PROMPT#1", "PROMPT#2", "WINSSH", "fxdeva10.factset.com \"~/create_prebuild.sh {{2}} {{1}}\""],
         "Linux": ["PROMPT#1", "ssh fxdeva10.factset.com \"cd ~/public_html/{{1}} && unzip -o deploy.zip && \\rm -f deploy.zip\""]
+      }
+    },
+    "14": {
+      "commandList": {
+        "Windows": ["PROMPT#1"],
+        "Linux": ["PROMPT#1"]
+      }
+    },
+    "15": {
+      "commandList": {
+        "Windows": ["PROMPT#2"],
+        "Linux": ["PROMPT#2"]
       }
     }
   },
@@ -147,15 +157,15 @@
         },
         {
           "name": "Upload Prebuild",
-          "commandSequence": [5, 10, 11, 12]
+          "commandSequence": [14, 5, 10, 11, 12]
         },
         {
           "name": "(Update) Build & Upload Prebuild",
-          "commandSequence": [1, 5, 10, 11, 12]
+          "commandSequence": [14, 1, 5, 10, 11, 12]
         },
         {
           "name": "(New) Build & Upload Prebuild",
-          "commandSequence": [1, 5, 10, 11, 12, 13]
+          "commandSequence": [14, 15, 1, 5, 10, 11, 12, 13]
         },
         {
           "name": "Clean Bower Install",
@@ -176,11 +186,11 @@
         },
         {
           "name": "(Update) Build & Upload Prebuild",
-          "commandSequence": [7, 4, 5, 10, 11, 12]
+          "commandSequence": [14, 7, 4, 5, 10, 11, 12]
         },
         {
           "name": "(New) Build & Upload Prebuild",
-          "commandSequence": [7, 4, 5, 10, 11, 12, 13]
+          "commandSequence": [14, 15, 7, 4, 5, 10, 11, 12, 13]
         },
         {
           "name": "Clean Bower Install",
