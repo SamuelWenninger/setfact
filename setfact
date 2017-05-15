@@ -152,6 +152,13 @@ def runTask(settings, location):
 
     return
 
+def determinePlatform():
+    ppid = os.getppid()
+    if psutil.Process(ppid).name() == 'cmd.exe' or platform.system() == 'Windows':
+        return 'Windows'
+    else:
+        return platform.system()
+
 def main():
     settings = readFile()
     if settings is False:
@@ -167,16 +174,5 @@ def main():
     return
 
 if __name__ == '__main__':
-    PLATFORM = ''
-    ppid = os.getppid()
-    if psutil.Process(ppid).name() == 'cmd.exe' or platform.system() == 'Windows':
-        PLATFORM = 'Windows'
-    else:
-        PLATFORM = platform.system()
+    PLATFORM = determinePlatform()
     main()
-
-# To Do
-## Add an upload prebuild task
-### Prompt the user for a prebuild folder and a prebuild name
-### Use PROMPT to prompt a user and VAR somewhere afterwards
-## Add a -f (file) option to allow the user to pass in a different settings.json file
