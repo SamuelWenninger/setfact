@@ -92,7 +92,6 @@ def handlePrompts(settings, commandList, promptResponses):
 # Input: "location" - a dict containing the "modeIndex" and "taskIndex"
 # Output:
 def runTask(settings, location):
-    #subprocess.run('mkdir -v test')
     commandList = []
     prevProjectId = False
     # Keep track of previous responses for commands that use the same prompt so that the user
@@ -101,14 +100,15 @@ def runTask(settings, location):
     for commandId in settings['modes'][location['modeIndex']]['tasks'][location['taskIndex']]['commandSequence']:
         # Get the command object
         command = settings['commands'][str(commandId)]
-        # Get the projectId associated with the command
-        commandProjectId = int(command['projectId'])
+        # Get the projectId associated with the command if there is one
+        commandProjectId = int(command['projectId']) if 'projectId' in command else False
         # If the next command is in a different project than the previous command, switch directories
         # to the location of said project before executing the requested command
-        if prevProjectId is False or commandProjectId != prevProjectId:
+        if (prevProjectId is False or commandProjectId != prevProjectId) and commandProjectId:
             prevProjectId = commandProjectId
             os.chdir(str(settings['projects'][str(commandProjectId)]['path'][PLATFORM]))
-        printBoxMenu([command['name']], len(command['name']))
+        if 'name' in command:
+            printBoxMenu([command['name']], len(command['name']))
         # The subprocess causes the output to be buffered so a manual flush is required here.
         sys.stdout.flush()
         updatedCommand = handlePrompts(settings, command['commandList'][PLATFORM], promptResponses)
