@@ -12,7 +12,13 @@ from scp import SCPClient
 #         object is malformed.
 def readFile():
     try:
-        with open('settings.json', 'r') as f:
+        settingsLoc = str(os.path.dirname(os.path.abspath(__file__)))
+        if PLATFORM == 'Windows':
+            settingsLoc += '\settings.json'
+        else:
+            settingsLoc += '/settings.json'
+        print(settingsLoc)
+        with open(settingsLoc, 'r') as f:
             return json.load(f)
     except:
         return False
