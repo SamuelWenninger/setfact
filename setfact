@@ -38,13 +38,27 @@ def readFile():
 # Desc: Print the strings in the menu list in a framed box
 # Input: "menu" - a list of strings to print
 #        "largestLine" - the length of the largest line
+#        "title" - a string to display at the top of task list menus
 # Output: N/A
-def printBoxMenu(menu, largestLine):
+def printBoxMenu(menu, largestLine, title=''):
+    if title != '':
+        print('-' * (largestLine + 4))
+        paddingSize = int(largestLine - len(title))
+        if paddingSize % 2 == 0:
+            print('| ' + (' ' * (paddingSize//2)) +  title + (' ' * (paddingSize//2)) +' |')
+        else:
+            print('| ' + (' ' * (paddingSize//2 + 1)) +  title + (' ' * (paddingSize//2)) +' |')
     print('-' * (largestLine + 4))
     for line in menu:
         print('| ' + line + (' ' * (largestLine - len(line))) +' |')
     print('-' * (largestLine + 4))
 
+def clearScreen():
+    ppid = os.getppid()
+    if psutil.Process(ppid).name() == 'cmd.exe':
+        os.system('cls')
+    else:
+        os.system('clear')
 
 # Desc: Prompt the user to select a mode and a task
 # Input: "settings" - a dict version of the settings JSON file
@@ -53,20 +67,24 @@ def printBoxMenu(menu, largestLine):
 def getUserInput(settings):
     location = {}
     menu = []
-    largestLine = 0
+    largestLine = len("Back")
     # Prompt the user to select the mode
     for index, item in enumerate(settings['modes']):
         line = str(index + 1) + ') ' + str(item['name'])
         if len(line) > largestLine:
             largestLine = len(line)
         menu.append(line)
+
     printBoxMenu(menu, largestLine)
-    mode = int(input('Choice: '))
+    mode = input('Choice: ')
+    clearScreen()
+    if not mode.isnumeric():
+        return -1
+    mode = int(mode)
     # Ensure the user's choice is within bounds
-    if mode > len(settings['modes']) or mode < 1: return False
+    if mode > len(settings['modes']) or mode < 1: return -1
     location['modeIndex'] = mode - 1
     menu = []
-    largestLine = 0
     taskCount = 0
     # Prompt the user to select the task
     for task in settings['modes'][mode-1]['tasks']:
@@ -75,10 +93,17 @@ def getUserInput(settings):
         if len(line) > largestLine:
             largestLine = len(line)
         menu.append(line)
-    printBoxMenu(menu, largestLine)
-    mode = int(input('Choice: '))
+    menu.append('!) Back')
+    printBoxMenu(menu, largestLine, settings['modes'][mode-1]['name'])
+    mode = input('Choice: ')
+    clearScreen()
+    if mode == '!':
+        return -2
+    if not mode.isnumeric():
+        return -1
+    mode = int(mode)
     # Ensure the user's choice is within bounds
-    if mode > taskCount or mode < 1: return False
+    if mode > taskCount or mode < 1: return -1
     location['taskIndex'] = mode - 1
     # Index is one less than the user inputted selection
     return location
@@ -190,15 +215,21 @@ def determinePlatform():
 # Input: N/A
 # Output: N/A
 def main():
+    clearScreen()
     settings = readFile()
     if settings is False:
         print('Error: Malformed JSON settings file')
         return
 
-    location = getUserInput(settings)
-    if location is False:
-        print('Error: Invalid option selected')
-        return
+    while 1:
+        location = getUserInput(settings)
+        if location == -1:
+            print('Error: Invalid option selected')
+            return
+        elif location == -2:
+            continue
+        else:
+            break
 
     runTask(settings, location)
     return
