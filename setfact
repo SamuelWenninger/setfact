@@ -1,12 +1,25 @@
 #!/c/Users/swenninger/AppData/Local/Programs/Python/Python36-32/python.exe
 
 # Created by Samuel Wenninger
-# Last modified 5/11/2017
+# Last modified 5/15/2017
 
-import json, subprocess, os, sys, platform, psutil, paramiko
+# Used to convert the JSON settings file to a Python data structure representation
+import json
+# Used to run shell commands in a subshell
+import subprocess
+# Various operating system related functionality such as changing directories or getting file paths
+import os
+# Used to flush the output buffer
+import sys
+# Used to get the name of the platform (i.e. Windows or Linux)
+import platform
+# Used to get the name of the process running this Python script (i.e. cmd.exe)
+import psutil
+# Used for Windows SSH and SCP
+import paramiko
 from scp import SCPClient
 
-# Desc: Read the settings file and turn it into a Python data structure (dict/list)
+# Desc: Read the settings file and turn it into a Python dictionary
 # Input: N/A
 # Output: The python representation of the JSON settings object or False if the settings
 #         object is malformed.
@@ -22,6 +35,10 @@ def readFile():
     except:
         return False
 
+# Desc: Print the strings in the menu list in a framed box
+# Input: "menu" - a list of strings to print
+#        "largestLine" - the length of the largest line
+# Output: N/A
 def printBoxMenu(menu, largestLine):
     print('-' * (largestLine + 4))
     for line in menu:
@@ -30,7 +47,7 @@ def printBoxMenu(menu, largestLine):
 
 
 # Desc: Prompt the user to select a mode and a task
-# Input: "settings" - a Python dict version of the settings JSON file
+# Input: "settings" - a dict version of the settings JSON file
 # Output: The index of the task to run in the tasks array
 #         "False" - if invalid user input
 def getUserInput(settings):
@@ -66,6 +83,12 @@ def getUserInput(settings):
     # Index is one less than the user inputted selection
     return location
 
+# Desc: Handle the PROMPT#<prompt-key> special command in the commandList
+# Input: "settings" - a dict version of the settings JSON file
+#        "commandList" - a list of strings representing commands to execute
+#        "promptResponses" - a dict used to store previous responses made to prompts so that multiple of the same prompt
+#                            are not shown to the user
+# Output: A list of commands with the {{<prompt-key}} replaced
 def handlePrompts(settings, commandList, promptResponses):
     stringCommandList = ''.join(commandList)
     if 'PROMPT' not in stringCommandList:
@@ -89,8 +112,9 @@ def handlePrompts(settings, commandList, promptResponses):
     return newCommandList
 
 # Desc: Run a given task in the correct context given the tasks index
-# Input: "location" - a dict containing the "modeIndex" and "taskIndex"
-# Output:
+# Input: "settings" - a dict version of the settings JSON file
+#        "location" - a dict containing the "modeIndex" and "taskIndex"
+# Output: N/A
 def runTask(settings, location):
     commandList = []
     prevProjectId = False
@@ -152,6 +176,9 @@ def runTask(settings, location):
 
     return
 
+# Desc: Determine if the user is running the script on Windows or Linux
+# Input: N/A
+# Output: The platform (Windows or Linux) as a string
 def determinePlatform():
     ppid = os.getppid()
     if psutil.Process(ppid).name() == 'cmd.exe' or platform.system() == 'Windows':
@@ -159,6 +186,9 @@ def determinePlatform():
     else:
         return platform.system()
 
+# Desc: Main control flow of the program
+# Input: N/A
+# Output: N/A
 def main():
     settings = readFile()
     if settings is False:
