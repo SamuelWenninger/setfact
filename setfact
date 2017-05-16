@@ -53,6 +53,9 @@ def printBoxMenu(menu, largestLine, title=''):
         print('| ' + line + (' ' * (largestLine - len(line))) +' |')
     print('-' * (largestLine + 4))
 
+# Desc: Clear the screen using the correct operating system command
+# Input: N/A
+# Output: N/A
 def clearScreen():
     ppid = os.getppid()
     if psutil.Process(ppid).name() == 'cmd.exe':
@@ -60,17 +63,42 @@ def clearScreen():
     else:
         os.system('clear')
 
+# Desc: Run
+# Input: "settings" - a dict version of the settings JSON file
+# Output: N/A
+def runCustomTask(settings):
+    menu = []
+    largestLine = 0
+    # Prompt the user to select the mode
+    for index, item in enumerate(settings['commands']):
+        if 'name' in settings['commands'][item]:
+            if 'projectId' in settings['commands'][item]:
+                projectName = settings['projects'][str(settings['commands'][item]['projectId'])]['name']
+                line = str(item + ') ' + '[' + projectName + '] ' + str(settings['commands'][item]['name']))
+            else:
+                line = str(item + ') ' + '[N/A] ' + str(settings['commands'][item]['name']))
+            if len(line) > largestLine:
+                largestLine = len(line)
+            menu.append(line)
+    menu.append('!) Back')
+    printBoxMenu(menu, largestLine, 'Custom Task')
+    mode = input('Enter space separated list of commands: ')
+    clearScreen()
+    if mode == '!':
+        return -2
+    return mode.split(' ')
+
 # Desc: Prompt the user to select a mode and a task
 # Input: "settings" - a dict version of the settings JSON file
 # Output: The index of the task to run in the tasks array
 #         "False" - if invalid user input
 def getUserInput(settings):
     location = {}
-    menu = []
-    largestLine = len("Back")
+    menu = ['1) Custom Task']
+    largestLine = len(menu[0])
     # Prompt the user to select the mode
     for index, item in enumerate(settings['modes']):
-        line = str(index + 1) + ') ' + str(item['name'])
+        line = str(index + 2) + ') ' + str(item['name'])
         if len(line) > largestLine:
             largestLine = len(line)
         menu.append(line)
@@ -81,20 +109,22 @@ def getUserInput(settings):
     if not mode.isnumeric():
         return -1
     mode = int(mode)
+    if mode == 1:
+        return runCustomTask(settings)
     # Ensure the user's choice is within bounds
-    if mode > len(settings['modes']) or mode < 1: return -1
-    location['modeIndex'] = mode - 1
+    if mode > len(settings['modes']) + 1 or mode < 1: return -1
+    location['modeIndex'] = mode - 2
     menu = []
     taskCount = 0
     # Prompt the user to select the task
-    for task in settings['modes'][mode-1]['tasks']:
+    for task in settings['modes'][mode-2]['tasks']:
         taskCount += 1
         line = str(taskCount) + ') ' + str(task['name'])
         if len(line) > largestLine:
             largestLine = len(line)
         menu.append(line)
     menu.append('!) Back')
-    printBoxMenu(menu, largestLine, settings['modes'][mode-1]['name'])
+    printBoxMenu(menu, largestLine, settings['modes'][mode-2]['name'])
     mode = input('Choice: ')
     clearScreen()
     if mode == '!':
@@ -106,7 +136,7 @@ def getUserInput(settings):
     if mode > taskCount or mode < 1: return -1
     location['taskIndex'] = mode - 1
     # Index is one less than the user inputted selection
-    return location
+    return settings['modes'][location['modeIndex']]['tasks'][location['taskIndex']]['commandSequence']
 
 # Desc: Handle the PROMPT#<prompt-key> special command in the commandList
 # Input: "settings" - a dict version of the settings JSON file
@@ -138,15 +168,14 @@ def handlePrompts(settings, commandList, promptResponses):
 
 # Desc: Run a given task in the correct context given the tasks index
 # Input: "settings" - a dict version of the settings JSON file
-#        "location" - a dict containing the "modeIndex" and "taskIndex"
+#        "commandList" - a list of command keys to execute
 # Output: N/A
-def runTask(settings, location):
-    commandList = []
+def runTask(settings, commandList):
     prevProjectId = False
     # Keep track of previous responses for commands that use the same prompt so that the user
     # is not prompted multiple times for the same information
     promptResponses = {}
-    for commandId in settings['modes'][location['modeIndex']]['tasks'][location['taskIndex']]['commandSequence']:
+    for commandId in commandList:
         # Get the command object
         command = settings['commands'][str(commandId)]
         # Get the projectId associated with the command if there is one
@@ -222,16 +251,16 @@ def main():
         return
 
     while 1:
-        location = getUserInput(settings)
-        if location == -1:
+        commandList = getUserInput(settings)
+        if commandList == -1:
             print('Error: Invalid option selected')
             return
-        elif location == -2:
+        elif commandList == -2:
             continue
         else:
             break
 
-    runTask(settings, location)
+    runTask(settings, commandList)
     return
 
 if __name__ == '__main__':
