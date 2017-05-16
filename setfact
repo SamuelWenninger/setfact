@@ -18,6 +18,8 @@ import psutil
 # Used for Windows SSH and SCP
 import paramiko
 from scp import SCPClient
+# Regular expressions
+import re
 
 # Desc: Read the settings file and turn it into a Python dictionary
 # Input: N/A
@@ -159,10 +161,11 @@ def handlePrompts(settings, commandList, promptResponses):
                 dirName = promptResponses[str(promptNum)]
             else:
                 dirName = input(settings['prompts'][promptNum]['text'])
-            promptResponses[str(promptNum)] = dirName
-            continue
-        if dirName is not False and ('{{' + promptNum + '}}') in command:
-            command = command.replace('{{' + promptNum + '}}', dirName)
+                promptResponses[str(promptNum)] = dirName
+                continue
+        promptKeys = re.findall('\{\{([^}]+)\}\}', command)
+        for key in promptKeys:
+            command = command.replace('{{' + key + '}}', promptResponses[key])
         newCommandList.append(command)
     return newCommandList
 
