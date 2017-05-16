@@ -131,6 +131,22 @@
         "Windows": ["PROMPT#2"],
         "Linux": ["PROMPT#2"]
       }
+    },
+    "16": {
+      "projectId": 2,
+      "name": "Run tests",
+      "commandList": {
+        "Windows": ["karma start karma.conf.js"],
+        "Linux": ["karma start karma.conf.js"]
+      }
+    },
+    "17": {
+      "projectId": 1,
+      "name": "Run tests",
+      "commandList": {
+        "Windows": ["karma start test/unit/karma.conf.js"],
+        "Linux": ["karma start test/unit/karma.conf.js"]
+      }
     }
   },
 
@@ -145,7 +161,7 @@
 
   "modes": [
     {
-      "name": "Only Frontend",
+      "name": "Frontend",
       "tasks": [
         {
           "name": "Build Dev",
@@ -168,8 +184,25 @@
           "commandSequence": [14, 15, 1, 5, 10, 11, 12, 13]
         },
         {
+          "name": "Run tests",
+          "commandSequence": [17]
+        },
+        {
           "name": "Clean Bower Install",
           "commandSequence": [8]
+        }
+      ]
+    },
+    {
+      "name": "Options Components",
+      "tasks": [
+        {
+          "name": "Run tests",
+          "commandSequence": [16]
+        },
+        {
+          "name": "Clean Bower Install",
+          "commandSequence": [9]
         }
       ]
     },
