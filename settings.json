@@ -38,16 +38,16 @@
       "projectId": 1,
       "name": "Building Grunt with OC for development",
       "commandList": {
-        "Windows": ["grunt build-pa3oc-local-dev"],
-        "Linux": ["grunt build-pa3oc-local-dev"]
+        "Windows": ["grunt build-pa3oc-local-dev --force"],
+        "Linux": ["grunt build-pa3oc-local-dev --force"]
       }
     },
     "4": {
       "projectId": 1,
       "name": "Building Grunt with OC for release",
       "commandList": {
-        "Windows": ["grunt build-pa3oc-local"],
-        "Linux": ["grunt build-pa3oc-local"]
+        "Windows": ["grunt build-pa3oc-local --force"],
+        "Linux": ["grunt build-pa3oc-local --force"]
       }
     },
     "5": {
