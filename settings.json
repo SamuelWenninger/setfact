@@ -117,16 +117,18 @@
       "name": "Create a LIMA override and a VMS prebuild",
       "commandList": {
         "Windows": ["PROMPT#1", "PROMPT#2", "WINSSH", "fxdeva10.factset.com \"~/create_prebuild.sh {{2}} {{1}}\""],
-        "Linux": ["PROMPT#1", "ssh fxdeva10.factset.com \"cd ~/public_html/{{1}} && unzip -o deploy.zip && \\rm -f deploy.zip\""]
+        "Linux": ["PROMPT#1", "PROMPT#2", "ssh fxdeva10.factset.com \"~/create_prebuild.sh {{2}} {{1}}\""]
       }
     },
     "14": {
+      "name": "Prompt for public_html directory name",
       "commandList": {
         "Windows": ["PROMPT#1"],
         "Linux": ["PROMPT#1"]
       }
     },
     "15": {
+      "name": "Prompt for prebuild name",
       "commandList": {
         "Windows": ["PROMPT#2"],
         "Linux": ["PROMPT#2"]
