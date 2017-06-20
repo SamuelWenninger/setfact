@@ -78,7 +78,7 @@
       "projectId": 1,
       "name": "Doing a clean bower install",
       "commandList": {
-        "Windows": ["rd /s /q bower_components", "bower cache clean", "bower install"],
+        "Windows": ["rmdir /s /q bower_components", "bower cache clean", "bower install"],
         "Linux": ["rm -rfv bower_components", "bower cache clean", "bower install"]
       }
     },
@@ -86,7 +86,7 @@
       "projectId": 2,
       "name": "Doing a clean bower install",
       "commandList": {
-        "Windows": ["rd /s /q bower_components", "bower cache clean", "bower install"],
+        "Windows": ["rmdir /s /q bower_components", "bower cache clean", "bower install"],
         "Linux": ["rm -rfv bower_components", "bower cache clean", "bower install"]
       }
     },
@@ -166,16 +166,24 @@
       "name": "Frontend",
       "tasks": [
         {
+          "name": "Only Upload Prebuild",
+          "commandSequence": [14, 5, 10, 11, 12]
+        },
+        {
           "name": "Build Dev",
           "commandSequence": [2]
         },
         {
-          "name": "Build Prebuild",
-          "commandSequence": [1]
+          "name": "(Update) Build Dev & Upload Dev Prebuild",
+          "commandSequence": [14, 2, 5, 10, 11, 12]
         },
         {
-          "name": "Upload Prebuild",
-          "commandSequence": [14, 5, 10, 11, 12]
+          "name": "(New) Build Dev & Upload Dev Prebuild",
+          "commandSequence": [14, 15, 2, 5, 10, 11, 12, 13]
+        },
+        {
+          "name": "Build Prebuild",
+          "commandSequence": [1]
         },
         {
           "name": "(Update) Build & Upload Prebuild",
@@ -214,6 +222,14 @@
         {
           "name": "Build Dev",
           "commandSequence": [6, 3]
+        },
+        {
+          "name": "(Update) Build Dev & Upload Dev Prebuild",
+          "commandSequence": [14, 6, 3, 5, 10, 11, 12]
+        },
+        {
+          "name": "(New) Build Dev & Upload Dev Prebuild",
+          "commandSequence": [14, 15, 6, 3, 5, 10, 11, 12, 13]
         },
         {
           "name": "Build Prebuild",
