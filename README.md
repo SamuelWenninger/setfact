@@ -3,7 +3,9 @@ A generic build script that is highly customizable through a JSON settings inter
 
 ## Installation Steps
 * Set up ssh-keys on both fonix and VMS
+* Install Python 3
 * Clone the repo
+* Change the first line of the `setfact` script to be the path to your Python executable
 * Run `pip install -r requirements.txt` in the repo
 * Add the path to the the folder where setfact is to your path
 * Call by entering `setfact` anywhere
