@@ -196,7 +196,10 @@ def runTask(settings, commandList):
         stringCommandList = ''.join(updatedCommand)
         if 'WINSSH' not in stringCommandList and 'WINSCP' not in stringCommandList:
             for item in updatedCommand:
-                subprocess.run(item, shell=True)
+                returnVal = subprocess.run(item, shell=True)
+                if returnVal.returncode != 0:
+                    print("ERROR: Task failed!!!")
+                    return
         else:
             arg = False
             ssh = paramiko.SSHClient()
